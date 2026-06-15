@@ -7,14 +7,15 @@ CC = i386-elf-gcc
 LD = i386-elf-ld
 CFLAGS = -g -ffreestanding -std=c99 -Wall -m32
 IMAGE = might.iso
+DATA_DISK = data.img
 
 # Указываем пути поиска для исходников, чтобы make видел их из разных папок
 VPATH = ../kernel:../drivers:../apps:..
 
 # =========================================================
-# ГЛАВНАЯ ЦЕЛЬ: СБОРКА LIMINE ISO
+# ГЛАВНАЯ ЦЕЛЬ: СБОРКА LIMINE ISO И ДИСКА ДАННЫХ
 # =========================================================
-all: $(IMAGE)
+all: $(IMAGE) $(DATA_DISK)
 
 $(IMAGE): kernel.bin
 	@echo "=> Создаем структуру ISO..."
@@ -40,11 +41,15 @@ $(IMAGE): kernel.bin
 	rm -rf isodir
 	@echo "=> ГОТОВО! Образ $(IMAGE) собран."
 
+# Создаём пустой диск данных для хранения файлов (50 МБ)
+$(DATA_DISK):
+	dd if=/dev/zero of=$(DATA_DISK) bs=512 count=100000 status=none
+
 # =========================================================
-# ЗАПУСК И КОМПИЛЯЦИЯ
+# ЗАПУСК: диск данных на primary master (0x1F0), ISO на secondary (0x170)
 # =========================================================
-run: $(IMAGE)
-	qemu-system-i386 -cdrom $(IMAGE) -m 128M
+run: $(IMAGE) $(DATA_DISK)
+	qemu-system-i386 -hda $(DATA_DISK) -cdrom $(IMAGE) -m 128M
 
 kernel.bin: $(OBJ)
 	$(LD) -m elf_i386 -T ../linker.ld -o $@ $^
@@ -56,5 +61,5 @@ kernel_entry.o: ../boot/kernel_entry.asm
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.bin *.o *.elf *.iso
+	rm -f *.bin *.o *.elf *.iso *.img
 	rm -rf isodir
