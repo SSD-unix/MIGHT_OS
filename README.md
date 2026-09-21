@@ -1,17 +1,18 @@
-![logo](https://i.imgur.com/PgDOez3.jpeg)
-# 🚀 MIGHT OS
-
 <div align="center">
 
-[![GitHub License](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](LICENSE)
+![MIGHT OS Logo](https://i.imgur.com/PgDOez3.jpeg)
+
+# 🚀 MIGHT OS
+
+[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](#-license)
+[![Architecture](https://img.shields.io/badge/architecture-x86__64-blue.svg)](#-tech-stack)
+[![Bootloader](https://img.shields.io/badge/bootloader-Limine-brightgreen.svg)](#-tech-stack)
 [![GitHub Stars](https://img.shields.io/github/stars/SSD-unix/MIGHT_OS?style=flat-square)](https://github.com/SSD-unix/MIGHT_OS/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/SSD-unix/MIGHT_OS?style=flat-square)](https://github.com/SSD-unix/MIGHT_OS/network)
 [![GitHub Issues](https://img.shields.io/github/issues/SSD-unix/MIGHT_OS?style=flat-square)](https://github.com/SSD-unix/MIGHT_OS/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/SSD-unix/MIGHT_OS?style=flat-square)](https://github.com/SSD-unix/MIGHT_OS/pulls)
 
-**An Educational Operating System Built From Scratch**
+**A 64-bit Freestanding Operating System Built From Scratch**
 
-[View on GitHub](https://github.com/SSD-unix/MIGHT_OS) • [Report Bug](https://github.com/SSD-unix/MIGHT_OS/issues) • [Request Feature](https://github.com/SSD-unix/MIGHT_OS/issues)
+[View on GitHub](https://github.com/SSD-unix/MIGHT_OS) • [Website](https://ssdunix.xyz) • [Developer SDK PDF](MIGHT_OS_Developer_Documentation.pdf)
 
 </div>
 
@@ -19,19 +20,21 @@
 
 ## 📖 About the Project
 
-MIGHT OS is an educational operating system built from scratch. This project is a deep dive into low-level programming, kernel development, and direct hardware abstraction.
+**MIGHT OS** is a freestanding **64-bit (x86-64)** operating system built from the ground up in C and NASM Assembly. Booted via the modern **Limine Bootloader**, MIGHT OS serves as a powerful demonstration of low-level system engineering, hardware interaction, and kernel design.
 
-The goal of this project is to build a functional, minimalistic OS while understanding every stage of the process: from the bootloader to memory management. MIGHT OS represents the drive and determination to master operating system fundamentals.
+From direct VGA memory manipulation to PCI scanning, custom flat-binary execution, and network framing — MIGHT OS implements every critical OS component without relying on standard C libraries or external kernel runtimes.
 
 ---
 
 ## ✨ Key Features
 
-- 🎯 **Custom Kernel**: Implementation of core system management functions
-- 💾 **Memory Awareness**: Detecting RAM size via CMOS
-- 🖥️ **Low-Level Output**: Direct VGA video memory manipulation for text rendering
-- ⚙️ **x86 Architecture**: Optimized for the classic i386 platform
-- 📚 **Educational Focus**: Well-documented code for learning purposes
+- ⚡ **64-Bit Long Mode Kernel**: Pure x86-64 execution built with GCC freestanding toolchain and Limine boot protocol.
+- 🚀 **Userland Binary Loader**: Execute external flat 64-bit binaries loaded directly from disk sectors with memory safety (`.text` execution section).
+- 🌐 **Intel e1000 Hardware Driver & Network Stack**: PCI Bus Scanner, DMA Ring Buffer transmission, and built-in **ICMP PING** tool.
+- 💾 **Hybrid Storage & Filesystem**: Fast HDD-backed filesystem with automated sector-packing (`pack.py`) and memory fallback.
+- 🖥️ **Interactive Shell & TTY**: Full keyboard scancode handler (Shift support, Backspace, Enter), VGA terminal controls, and system clocks.
+- 📝 **Built-in `nano` Editor**: Integrated text editor with buffer scrolling and disk persistence.
+- ⚙️ **BIOS-style `UX` Setup Utility**: Built-in graphical-like configuration menu rendered in VGA text mode.
 
 ---
 
@@ -39,102 +42,124 @@ The goal of this project is to build a functional, minimalistic OS while underst
 
 | Component | Technology |
 |-----------|-----------|
-| **Languages** | C, Assembly (NASM) |
-| **Toolchain** | GCC, LD |
-| **Emulation** | QEMU |
-| **Environment** | Linux-based development |
+| **Architecture** | x86-64 (AMD64 / Long Mode) |
+| **Bootloader** | Limine Protocol (v8.x) |
+| **Languages** | C (C99 Freestanding), NASM Assembly |
+| **Networking** | Intel 82540EM (e1000) PCI Driver, DMA Ring Buffer |
+| **Toolchain** | GCC, LD, NASM, Python 3 (Disk Packer) |
+| **Emulation** | QEMU (`qemu-system-x86_64`) |
 
 ---
 
-## 🧬 Credits & Acknowledgments
+## ⚡ Interactive Shell Commands
 
-This operating system is based on the os-project by Denis Nikulin. The original source code served as the foundation and was heavily modified and expanded during the development of MIGHT OS.
+MIGHT OS includes a full command-line shell:
 
----
+```text
+  HELP      - Display all available system commands
+  LS        - List files in the filesystem
+  RUN <app> - Read and execute 64-bit binary from disk sectors
+  PING <host>- Transmit ICMP Echo Requests via Intel e1000 PCI card
+  NETINIT   - Scan PCI bus and re-initialize e1000 hardware
+  NANO <file>- Open built-in text editor
+  CAT <file> - Display file contents to console
+  TOUCH/ECHO- File management and text output
+  UX        - Launch BIOS-style System Setup Utility
+  INFO/TIME - Display system metrics and real-time clock
+  CLEAR     - Reset terminal display
 
-## 🚀 Installation & Quick Start
+🚀 Building & Running
+1. Prerequisites
 
-### 1. Prerequisites
+Install required tools and build dependencies on Linux (Arch / Debian / Ubuntu):
+Bash
 
-Install the QEMU emulator:
-
-```bash
+# Ubuntu / Debian
 sudo apt update
-sudo apt install qemu-kvm qemu
-sudo apt install xorriso mtools git make gcc
-git clone https://github.com/limine-bootloader/limine.git --branch v8.x-branch-binary --depth=1
+sudo apt install qemu-system-x86 gcc nasm make xorriso mtools python3 git
+
+# Arch Linux
+sudo pacman -S qemu-full gcc nasm make xorriso mtools python git
+
+2. Install Limine Bootloader
+Bash
+
+git clone [https://github.com/limine-bootloader/limine.git](https://github.com/limine-bootloader/limine.git) --branch v8.x-branch-binary --depth=1
 make -C limine
 sudo make -C limine install
 
-```
+3. Build MIGHT OS & Pack Disk Image
 
-### 2. Set Up the Cross-Compiler
+Clone the repository and compile the kernel alongside user applications:
+Bash
 
-For x86_64 Linux systems, use a prebuilt i386-elf toolchain:
-
-```bash
-wget http://newos.org/toolchains/i386-elf-4.9.1-Linux-x86_64.tar.xz
-sudo mkdir -p /usr/local/i386elfgcc
-sudo tar -xf i386-elf-4.9.1-Linux-x86_64.tar.xz -C /usr/local/i386elfgcc --strip-components=1
-export PATH=$PATH:/usr/local/i386elfgcc/bin
-```
-
-### 3. Build the Project
-
-Clone the repository and run the build script:
-
-```bash
-git clone https://github.com/SSD-unix/MIGHT_OS.git
+git clone [https://github.com/SSD-unix/MIGHT_OS.git](https://github.com/SSD-unix/MIGHT_OS.git)
 cd MIGHT_OS/src/build
+
+# Compile kernel, assemble hello.bin, and generate data.img + might.iso
 make
-```
 
-### 4. Run the OS
+4. Launch in QEMU
 
-Launch the generated image using QEMU:
+Run the OS with attached network card and raw disk drive:
+Bash
 
-```bash
 make run
-```
 
+📄 Application SDK for Developers
 
+MIGHT OS supports running custom 64-bit binaries written in Assembly or C.
 
----
+    Write your binary using RIP-relative addressing:
+    Code snippet
 
-## 🤝 Contributing
+    [bits 64]
+    global _start
+    _start:
+        push rbp
+        mov rbp, rsp
+        ; Your code here
+        pop rbp
+        ret
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+    Compile into a flat binary: nasm -f bin app.asm -o app.bin
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+    Pack into the disk image: python3 pack.py app.bin data.img
 
----
+    Run inside MIGHT OS: > RUN HELLO
 
-## 📝 License
+See the full MIGHT OS Developer Manual (PDF) for complete ABI and Syscall specifications.
+📝 License
+Plaintext
 
-This project is licensed under the GNU General Public License v3 (GPL v3) - see the [LICENSE](LICENSE) file for details.
+Copyright (c) 2026 SSD-unix. All rights reserved.
 
----
+TERMS AND CONDITIONS FOR USE, DISTRIBUTION, AND REPRODUCTION
 
-## 📧 Contact & Support
+1. VIEWING RIGHTS ONLY:
+   You are granted a non-exclusive right to view, read, and inspect the 
+   source code of MIGHT OS solely for educational, evaluation, and review 
+   purposes.
 
-- **GitHub Issues**: [Report bugs or request features](https://github.com/SSD-unix/MIGHT_OS/issues)
-- **GitHub Discussions**: [Join our community discussions](https://github.com/SSD-unix/MIGHT_OS/discussions)
+2. RESTRICTIONS:
+   - You may NOT compile, run, execute, or deploy this source code or any 
+     portion thereof without explicit written permission from the copyright holder.
+   - You may NOT modify, fork, alter, or create derivative works based on 
+     this source code.
+   - You may NOT copy, paste, distribute, or incorporate any part of this 
+     code into any other software or project.
+   - You may NOT use this software or its source code for any commercial or 
+     non-commercial purposes.
 
----
+3. NO WARRANTY:
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 
-<div align="center">
+📧 Contact & Support
 
-**⭐ If you find this project helpful, please consider giving it a star!**
+    Author Website: ssdunix.xyz
 
-[Back to Top](#-might-os)
+    GitHub Issues: Report bugs or technical issues
 
-</div>
-# 🚀 MIGHT OS
+⭐ If you find MIGHT OS interesting, please give the repository a star!
 
-<div align="center">
-
-
+Back to Top
