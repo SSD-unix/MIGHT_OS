@@ -11,8 +11,7 @@
 [![GitHub Issues](https://img.shields.io/github/issues/SSD-unix/MIGHT_OS?style=flat-square)](https://github.com/SSD-unix/MIGHT_OS/issues)
 
 **A 64-bit freestanding operating system built from scratch**
-
-[View on GitHub](https://github.com/SSD-unix/MIGHT_OS) • [Website](https://os.ssdunix.xyz) • [Developer SDK PDF]([https://os.ssdunix.xyz](https://ia903205.us.archive.org/6/items/might-1.1-alpha-too-many-bugs-545/MIGHT_OS_Developer_Documentation.pdf))
+[View on GitHub](https://github.com/SSD-unix/MIGHT_OS) • [Website](https://os.ssdunix.xyz) • [DOWNLOAD](https://archive.org/download/might-1.1-alpha-too-many-bugs-545/might.iso) • [Developer SDK PDF](https://ia903205.us.archive.org/6/items/might-1.1-alpha-too-many-bugs-545/MIGHT_OS_Developer_Documentation.pdf)
 </div>
 
 ---
