@@ -12,7 +12,7 @@
 
 **A 64-bit freestanding operating system built from scratch**
 
-[View on GitHub](https://github.com/SSD-unix/MIGHT_OS) • [Website](https://ssdunix.xyz) • [Developer SDK PDF](MIGHT_OS_Developer_Documentation.pdf)
+[View on GitHub](https://github.com/SSD-unix/MIGHT_OS) • [Website](https://os.ssdunix.xyz) • [Developer SDK PDF]([MIGHT_OS_Developer_Documentation.pdf](https://ia903205.us.archive.org/6/items/might-1.1-alpha-too-many-bugs-545/MIGHT_OS_Developer_Documentation.pdf))
 
 </div>
 
