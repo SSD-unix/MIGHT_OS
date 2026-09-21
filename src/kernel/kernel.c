@@ -1,10 +1,8 @@
-/* kernel/kernel.c */
 #include "../common.h"
 #include "../drivers/screen.h"
 #include "../drivers/lowlevel_io.h"
 #include "../drivers/pit.h"
 #include "../drivers/idt.h"
-#include "../drivers/e1000.h"
 #include "utils.h"
 
 // --- Прототипы функций ядра (для предотвращения ошибок implicit declaration) ---
@@ -391,7 +389,7 @@ void execute_command(char *input) {
         ux_mode();
     }
     else if (compare_string(input, "HELP") == 0) {
-        kprint("System: HELP, CLEAR, EXIT, UX, INFO, TIME, LS, FORMAT, TOUCH, ECHO, SUDO, RUN, NANO, CAT, NETINIT, PING\n");
+        kprint("System: HELP, CLEAR, EXIT, UX, INFO, TIME, LS, FORMAT, TOUCH, ECHO, SUDO, RUN, NANO, CAT\n");
     }
     else if (compare_string(input, "INFO") == 0) {
         kprint("MIGHT OS 1.1 alpha\nSite: ssdunix.xyz\nTotal RAM: ");
@@ -422,18 +420,6 @@ void execute_command(char *input) {
     }
     else if (compare_string(input, "FORMAT") == 0) {
         format_disk();
-    }
-    else if (compare_string(input, "NETINIT") == 0) {
-        e1000_init();
-    }
-    else if (input[0] == 'P' && input[1] == 'I' && input[2] == 'N' && input[3] == 'G') {
-        if (input[4] == ' ') {
-            char* host = input + 5;
-            while (*host == ' ') host++;
-            ping_host(host);
-        } else {
-            ping_host("google.com");
-        }
     }
     else if (input[0] == 'T' && input[1] == 'O' && input[2] == 'U' && input[3] == 'C' && input[4] == 'H') {
         if (input[5] == ' ') touch_file(input + 6);
@@ -556,8 +542,6 @@ void kmain() {
     // Смещаем курсор вниз под графическую рамку
     kprint("\n\n\n\n\n\n\n");
 
-    // Инициализация сети
-    e1000_init();
     kprint("\nType HELP to view available commands.\n\n");
 
     char user_input[256];
