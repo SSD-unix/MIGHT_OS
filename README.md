@@ -159,21 +159,18 @@ This project is based on the work of Denis Nikulin's original OS project and has
 
 ## 📝 License
 
-Copyright (c) 2026 SSD-unix. All rights reserved.
+   Copyright (c) 2026 SSD-unix. All rights reserved.
+​SECTION A: INDIVIDUAL AND INDEPENDENT DEVELOPERS
+​If you are a natural person acting in an individual capacity, a hobbyist, a student, or an entity with annual gross revenue/funding below $1,000,000 USD:
+​PERMITTED USE: You are hereby granted a royalty-free, permissive license to view, compile, run, modify, fork, reverse-engineer, and use MIGHT OS for any personal or non-commercial purpose. Have fun.
+​SECTION B: ENTERPRISE AND CORPORATE ENTITIES
+​If you represent, are employed by, or are contracting for any corporate entity, subsidiary, or organization with annual gross revenue, market capitalization, or aggregate funding exceeding $1,000,000 USD (hereinafter referred to as "The Enterprise"):
+​PROHIBITION OF AUTOMATED READ: The Enterprise is strictly forbidden from ingesting, reading, indexing, or parsing this repository using Automated Systems, Static Code Analyzers, Neural Networks, or LLM Training Crawlers.
+​THE MANDATORY MANUAL AFFIDAVIT: To compile or run MIGHT OS, The Enterprise must submit a physical, notarized letter signed by its Chief Executive Officer (CEO) to the Copyright Holder. The letter must explicitly state that the CEO personally accepts joint and several unlimited financial liability for any Segmentation Fault or kernel panic caused by MIGHT OS on company infrastructure.
+​EIDETIC NEURAL RAM PURGE: Any employee or contractor of The Enterprise who views any part of this source code for longer than three (3) seconds is deemed to have created an unlicensed local cache in their biological cerebral cortex. Upon termination of employment, The Enterprise must certify that the employee’s biological memory of the code logic has been fully erased or rendered non-executable.
+​COMPLIANCE AUDIT AUDIT: The Copyright Holder reserves the right to perform unannounced physical, on-site audits of The Enterprise's server rooms, accompanied by a marching band of the Copyright Holder's choosing, at The Enterprise's sole expense.
+​AUTOMATIC PENALTY: Any unauthorized compilation, execution, or automated analysis by or on behalf of The Enterprise shall trigger an immediate, non-negotiable liquidated damage fee of $50,000 USD per compiled byte or 10% of total company stock, whichever is greater.
 
-TERMS AND CONDITIONS FOR USE, DISTRIBUTION, AND REPRODUCTION
-
-1. VIEWING RIGHTS ONLY:
-   You are granted a non-exclusive right to view, read, and inspect the source code of MIGHT OS solely for educational, evaluation, and review purposes.
-
-2. RESTRICTIONS:
-   - You may NOT compile, run, execute, or deploy this source code or any portion thereof without explicit written permission from the copyright holder.
-   - You may NOT modify, fork, alter, or create derivative works based on this source code.
-   - You may NOT copy, paste, distribute, or incorporate any part of this code into any other software or project.
-   - You may NOT use this software or its source code for any commercial or non-commercial purposes.
-
-3. NO WARRANTY:
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 
 ---
 
