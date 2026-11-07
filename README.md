@@ -1,140 +1,112 @@
-![logo](https://i.imgur.com/PgDOez3.jpeg)
+![MIGHT OS logo](https://i.imgur.com/PgDOez3.jpeg)
+
 # 🚀 MIGHT OS
 
 <div align="center">
 
-[![GitHub License](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Custom%20Proprietary-red.svg)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/SSD-unix/MIGHT_OS?style=flat-square)](https://github.com/SSD-unix/MIGHT_OS/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/SSD-unix/MIGHT_OS?style=flat-square)](https://github.com/SSD-unix/MIGHT_OS/network)
 [![GitHub Issues](https://img.shields.io/github/issues/SSD-unix/MIGHT_OS?style=flat-square)](https://github.com/SSD-unix/MIGHT_OS/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/SSD-unix/MIGHT_OS?style=flat-square)](https://github.com/SSD-unix/MIGHT_OS/pulls)
 
-**An Educational Operating System Built From Scratch**
+**An experimental educational operating system built from scratch**
 
-[View on GitHub](https://github.com/SSD-unix/MIGHT_OS) • [Report Bug](https://github.com/SSD-unix/MIGHT_OS/issues) • [Request Feature](https://github.com/SSD-unix/MIGHT_OS/issues)
+[Source](https://github.com/SSD-unix/MIGHT_OS) · [Report a bug](https://github.com/SSD-unix/MIGHT_OS/issues) · [Request a feature](https://github.com/SSD-unix/MIGHT_OS/issues)
 
 </div>
 
 ---
 
-## 📖 About the Project
+## About
 
-MIGHT OS is an educational operating system built from scratch. This project is a deep dive into low-level programming, kernel development, and direct hardware abstraction.
+MIGHT OS is a small operating-system project for exploring kernel development, boot processes, and low-level programming. The source tree includes boot code, a C kernel, drivers, networking, a browser component, and libraries. It is an experimental learning project, not a general-purpose operating system.
 
-The goal of this project is to build a functional, minimalistic OS while understanding every stage of the process: from the bootloader to memory management. MIGHT OS represents the drive and determination to master operating system fundamentals.
+The project is primarily written in C, with C++ and x86-64 assembly. The build creates a Limine-bootable ISO and a data disk image, and provides a QEMU run target.
 
----
+## Features and project areas
 
-## ✨ Key Features
+- Custom kernel and x86-64 boot code
+- Limine-based bootable ISO with BIOS and UEFI boot files
+- Graphics and device-driver code
+- Networking code, including lwIP integration and e1000 support
+- Browser and user applications under `src/browser` and `src/kernel/apps`
+- A small image-packing tool for the project's data disk format
 
-- 🎯 **Custom Kernel**: Implementation of core system management functions
-- 💾 **Memory Awareness**: Detecting RAM size via CMOS
-- 🖥️ **Low-Level Output**: Direct VGA video memory manipulation for text rendering
-- ⚙️ **x86 Architecture**: Optimized for the classic i386 platform
-- 📚 **Educational Focus**: Well-documented code for learning purposes
+Features are under active development; expect incomplete or changing behavior.
 
----
+## Repository layout
 
-## 🛠 Tech Stack
+| Path | Contents |
+| --- | --- |
+| `src/boot` | Boot and startup assembly |
+| `src/kernel` | Kernel and application code |
+| `src/drivers` | Device drivers |
+| `src/net` | Networking code |
+| `src/browser` | Browser component |
+| `src/lib` | Shared libraries |
+| `src/build` | Makefile and generated build outputs |
+| `src/pack.py` | Packs an application binary into a MIGHT data image |
 
-| Component | Technology |
-|-----------|-----------|
-| **Languages** | C, Assembly (NASM) |
-| **Toolchain** | GCC, LD |
-| **Emulation** | QEMU |
-| **Environment** | Linux-based development |
+## Build and run on Arch Linux
 
----
+The instructions below use Arch Linux packages and the toolchain defined by `src/build/Makefile`; a separate cross-compiler setup is not required by this build.
 
-## 🧬 Credits & Acknowledgments
+### 1. Install dependencies
 
-This operating system is based on the os-project by Denis Nikulin. The original source code served as the foundation and was heavily modified and expanded during the development of MIGHT OS.
-
----
-
-## 🚀 Installation & Quick Start
-
-### 1. Prerequisites
-
-Install the QEMU emulator:
+Update the package database and install the compiler, assembler, build tools, Limine files, ISO utility, and QEMU x86 emulator:
 
 ```bash
-sudo apt update
-sudo apt install qemu-kvm qemu
-sudo apt install xorriso mtools git make gcc
-git clone https://github.com/limine-bootloader/limine.git --branch v8.x-branch-binary --depth=1
-make -C limine
-sudo make -C limine install
-
+sudo pacman -Syu
+sudo pacman -S --needed base-devel git nasm python xorriso limine qemu-system-x86
 ```
 
-### 2. Set Up the Cross-Compiler
+The Makefile expects Limine's BIOS/UEFI files under `/usr/share/limine/`. If the build reports that one of those files is missing, verify that the installed Limine package provides the expected files before building.
 
-For x86_64 Linux systems, use a prebuilt i386-elf toolchain:
-
-```bash
-wget http://newos.org/toolchains/i386-elf-4.9.1-Linux-x86_64.tar.xz
-sudo mkdir -p /usr/local/i386elfgcc
-sudo tar -xf i386-elf-4.9.1-Linux-x86_64.tar.xz -C /usr/local/i386elfgcc --strip-components=1
-export PATH=$PATH:/usr/local/i386elfgcc/bin
-```
-
-### 3. Build the Project
-
-Clone the repository and run the build script:
+### 2. Clone the repository
 
 ```bash
 git clone https://github.com/SSD-unix/MIGHT_OS.git
-cd MIGHT_OS/src/build
+cd MIGHT_OS
+```
+
+### 3. Build the ISO and data disk
+
+Run `make` from the build directory:
+
+```bash
+cd src/build
 make
 ```
 
-### 4. Run the OS
+The build outputs `might.iso` and `data.img` in `src/build/`. The Makefile assembles the boot and application code, compiles and links the kernel, then packages the ISO and data image.
 
-Launch the generated image using QEMU:
+### 4. Run in QEMU
+
+From `src/build`, launch the project with:
 
 ```bash
 make run
 ```
 
+The run target starts `qemu-system-x86_64` with the generated ISO and data disk. To remove generated files and rebuild from scratch, run `make clean` in the same directory.
 
+> **Safety:** Run MIGHT OS in an emulator while experimenting. It is experimental software; do not boot it on a machine containing important data or use it as your primary operating system.
 
----
+## Contributing
 
-## 🤝 Contributing
+Contributions and bug reports are welcome. Open an issue to discuss a change, then submit a pull request with a focused description and testing notes.
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+## License
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+This project is distributed under the custom proprietary license in [LICENSE](LICENSE). Review its terms before using or redistributing the code.
 
----
+## Support
 
-## 📝 License
-
-This project is licensed under the GNU General Public License v3 (GPL v3) - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 📧 Contact & Support
-
-- **GitHub Issues**: [Report bugs or request features](https://github.com/SSD-unix/MIGHT_OS/issues)
-- **GitHub Discussions**: [Join our community discussions](https://github.com/SSD-unix/MIGHT_OS/discussions)
+- [Report bugs or request features](https://github.com/SSD-unix/MIGHT_OS/issues)
 
 ---
 
 <div align="center">
 
-**⭐ If you find this project helpful, please consider giving it a star!**
-
-[Back to Top](#-might-os)
+[Back to top](#-might-os)
 
 </div>
-# 🚀 MIGHT OS
-
-<div align="center">
-
-
