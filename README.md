@@ -1,1 +1,0 @@
-# TESTASTERON_OS
