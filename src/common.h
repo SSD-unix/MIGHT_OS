@@ -1,23 +1,17 @@
-/* common.h */
 #ifndef COMMON_H
 #define COMMON_H
 
-// 1. Базовые типы
-typedef unsigned char  uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int   uint32_t;
-typedef char           int8_t;
-typedef short          int16_t;
-typedef int            int32_t;
+#include <stdint.h>   // уже определяет int8_t, int16_t, int32_t и т.д.
 
-// 2. Твои сокращения (чтобы kmain и остальное не падало)
-typedef int32_t  s32;
-typedef uint32_t u32;
-typedef int16_t  s16;
-typedef uint16_t u16;
-typedef int8_t   s8;
+// Сокращения (u8, u16 и т.д.) оставляем, они базируются на стандартных типах
 typedef uint8_t  u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef int8_t   s8;
+typedef int16_t  s16;
+typedef int32_t  s32;
 
-void memory_copy(char *source, char *dest, int nbytes);
+// Функция memcpy
+void memcpy(u8 *src, u8 *dest, u32 bytes);
 
 #endif

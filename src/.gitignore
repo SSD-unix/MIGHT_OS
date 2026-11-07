@@ -1,0 +1,8 @@
+*.iso
+*.img
+*.log
+*.pcap
+src/build/
+*.o
+*.bin
+*.elf
