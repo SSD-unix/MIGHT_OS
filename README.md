@@ -99,7 +99,7 @@ Contributions and bug reports are welcome. Open an issue to discuss a change, th
 
 ## License
 
-This project is distributed under the custom proprietary license in [LICENSE](LICENSE). Review its terms before using or redistributing the code.
+This project is distributed under the MIT license in [LICENSE](LICENSE). Review its terms before using or redistributing the code.
 
 ## Support
 
