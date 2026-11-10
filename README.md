@@ -98,7 +98,7 @@ Contributions and bug reports are welcome. Open an issue to discuss a change, th
 
 ## License
 
-This project is distributed under a custom proprietary license. See [LICENSE](LICENSE) for the full terms. Viewing is permitted for evaluation and educational review only; redistribution, modification, execution, and other uses require explicit written permission from the copyright holder.
+This project is distributed under a MIT. See [LICENSE](LICENSE) for the full terms.
 
 ## Support
 
