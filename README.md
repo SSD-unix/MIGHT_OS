@@ -4,7 +4,6 @@
 
 <div align="center">
 
-[![License](https://img.shields.io/badge/license-Custom%20Proprietary-red.svg)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/SSD-unix/MIGHT_OS?style=flat-square)](https://github.com/SSD-unix/MIGHT_OS/stargazers)
 [![GitHub Issues](https://img.shields.io/github/issues/SSD-unix/MIGHT_OS?style=flat-square)](https://github.com/SSD-unix/MIGHT_OS/issues)
 
