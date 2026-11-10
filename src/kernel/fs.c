@@ -6,19 +6,20 @@
 extern void kprint(const char* str);
 extern void kprint_int(int n);
 
-// Pochistvane na prazni simvoli, nov red i probeli
+static void memory_set(void* dest, uint8_t val, uint32_t len) {
+    uint8_t* ptr = (uint8_t*)dest;
+    for (uint32_t i = 0; i < len; i++) ptr[i] = val;
+}
+
+// Очистка от пробелов и переносов строк с гарантированным обнулением
 static void trim_string(char* dest, const char* src, int max_len) {
+    memory_set(dest, 0, max_len);
     int i = 0, j = 0;
     while (src[i] == ' ' || src[i] == '\t') i++;
     while (src[i] != '\0' && src[i] != ' ' && src[i] != '\n' && src[i] != '\r' && j < (max_len - 1)) {
         dest[j++] = src[i++];
     }
     dest[j] = '\0';
-}
-
-static void memory_set(void* dest, uint8_t val, uint32_t len) {
-    uint8_t* ptr = (uint8_t*)dest;
-    for (uint32_t i = 0; i < len; i++) ptr[i] = val;
 }
 
 static int find_free_inode() {
@@ -42,7 +43,7 @@ static void write_inode(int inode_id, struct MightInode* in) {
     write_sector(FS_INODE_TABLE_LBA + s, (uint8_t*)inodes);
 }
 
-// Proverka: ispol'zuetsya li LBA sektor v lyuboj iz tsepochok fajlov
+// Проверка: используется ли LBA сектор в любой из цепочек файлов
 static int is_lba_used(uint32_t check_lba) {
     struct MightInode inodes[16];
     for (int s = 0; s < 8; s++) {
@@ -54,7 +55,7 @@ static int is_lba_used(uint32_t check_lba) {
                 while (curr != MIGHT_EOF && curr != 0) {
                     if (curr == check_lba) return 1;
                     read_sector(curr, buf);
-                    curr = *(uint32_t*)buf; // Pervye 4 bajta — sleduyushchij LBA
+                    curr = *(uint32_t*)buf; // Первые 4 байта — следующий LBA
                 }
             }
         }
@@ -62,7 +63,7 @@ static int is_lba_used(uint32_t check_lba) {
     return 0;
 }
 
-// Poisk pervogo svobodnogo LBA sektora
+// Поиск первого свободного LBA сектора
 static uint32_t alloc_free_lba() {
     for (uint32_t lba = FS_DATA_START_LBA; lba < 20000; lba++) {
         if (!is_lba_used(lba)) return lba;
@@ -100,7 +101,7 @@ void format_disk() {
     root_inode.type = TYPE_DIR;
     root_inode.used = 1;
 
-    // Zapisyvaem dlya korni pustoj sektor s EOF
+    // Записываем для корня пустой сектор с EOF
     memory_set(sector_buf, 0, 512);
     *(uint32_t*)sector_buf = MIGHT_EOF;
     write_sector(FS_DATA_START_LBA, sector_buf);
@@ -131,7 +132,7 @@ void list_files() {
                 kprint(inodes[i].name);
 
                 int name_len = 0;
-                while (inodes[i].name[name_len] != '\0') name_len++;
+                while (inodes[i].name[name_len] != '\0' && name_len < 16) name_len++;
                 for (int sp = 0; sp < (16 - name_len); sp++) kprint(" ");
 
                 kprint(" | Size: ");
@@ -198,7 +199,7 @@ void write_file(char* filename, char* data) {
     uint32_t data_len = 0;
     while (data[data_len] != '\0') data_len++;
 
-    // 1. ISHCHEM: Sushchestvuet li uzhe inode s takim imenem?
+    // 1. ИЩЕМ: Существует ли уже inode с таким именем?
     int target_inode = -1;
     struct MightInode inodes[16];
 
@@ -213,7 +214,7 @@ void write_file(char* filename, char* data) {
         if (target_inode != -1) break;
     }
 
-    // 2. Esli ne nashli — berem svobodnyj inode
+    // 2. Если не нашли — берем свободный inode
     if (target_inode == -1) {
         target_inode = find_free_inode();
         if (target_inode == -1) {
@@ -222,7 +223,7 @@ void write_file(char* filename, char* data) {
         }
     }
 
-    // 3. Zapisyvaem fajl tsepochkoj sekotov
+    // 3. Записываем файл цепочкой секторов
     uint32_t bytes_left = data_len;
     uint32_t data_offset = 0;
     uint32_t prev_lba = 0;
@@ -237,7 +238,7 @@ void write_file(char* filename, char* data) {
 
         if (first_lba == 0) first_lba = free_lba;
 
-        // Esli eto ne pervyj sektor — svyazyvaem predydushchij s tekushchim
+        // Если это не первый сектор — связываем предыдущий с текущим
         if (prev_lba != 0) {
             uint8_t prev_buf[512];
             read_sector(prev_lba, prev_buf);
@@ -248,10 +249,10 @@ void write_file(char* filename, char* data) {
         uint8_t sector_buf[512];
         memory_set(sector_buf, 0, 512);
 
-        // Ustanavlivaem konets fajla po umolchaniyu
+        // Устанавливаем конец файла по умолчанию
         *(uint32_t*)sector_buf = MIGHT_EOF;
 
-        // Zapolnyaem ostavshiesya 508 bajt dannymi
+        // Заполняем оставшиеся 508 байт данными
         for (int i = 4; i < 512 && bytes_left > 0; i++) {
             sector_buf[i] = data[data_offset++];
             bytes_left--;
@@ -263,7 +264,7 @@ void write_file(char* filename, char* data) {
         if (bytes_left == 0) break;
     }
 
-    // 4. Obnovlyaem / Sohranyaem Inode
+    // 4. Обновляем / Сохраняем Inode
     struct MightInode file_inode;
     memory_set(&file_inode, 0, sizeof(struct MightInode));
     trim_string(file_inode.name, clean_fname, 16);
@@ -296,7 +297,7 @@ void read_file(char* filename, char* buffer) {
                     uint32_t curr_lba = inodes[i].first_lba;
                     uint32_t buf_idx = 0;
 
-                    // Chitaem po tsepochke do MIGHT_EOF ili vyhoda za size
+                    // Читаем по цепочке до MIGHT_EOF или выхода за size
                     while (curr_lba != MIGHT_EOF && curr_lba != 0 && buf_idx < inodes[i].size) {
                         uint8_t sector_buf[512];
                         read_sector(curr_lba, sector_buf);

@@ -10,6 +10,8 @@
 
 **An experimental educational operating system built from scratch**
 
+[![DOWNLOAD ISO](https://img.shields.io/badge/DOWNLOAD-ISO-blue?style=for-the-badge)](https://github.com/SSD-unix/MIGHT_OS/raw/refs/heads/master/src/build/might.iso)
+
 [Source](https://github.com/SSD-unix/MIGHT_OS) · [Report a bug](https://github.com/SSD-unix/MIGHT_OS/issues) · [Request a feature](https://github.com/SSD-unix/MIGHT_OS/issues)
 
 </div>
@@ -18,7 +20,7 @@
 
 ## About
 
-MIGHT OS is a small operating-system project for exploring kernel development, boot processes, and low-level programming. The source tree includes boot code, a C kernel, drivers, networking, a browser component, and libraries. It is an experimental learning project, not a general-purpose operating system.
+MIGHT OS is a small operating-system project for exploring kernel development, boot processes, and low-level programming. The source tree includes boot code, a C kernel, drivers, networking, a browser, and applications.
 
 The project is primarily written in C, with C++ and x86-64 assembly. The build creates a Limine-bootable ISO and a data disk image, and provides a QEMU run target.
 
@@ -59,7 +61,7 @@ sudo pacman -Syu
 sudo pacman -S --needed base-devel git nasm python xorriso limine qemu-system-x86
 ```
 
-The Makefile expects Limine's BIOS/UEFI files under `/usr/share/limine/`. If the build reports that one of those files is missing, verify that the installed Limine package provides the expected files before building.
+The Makefile expects Limine's BIOS/UEFI files under `/usr/share/limine/`. If the build reports that one of those files is missing, verify that the installed Limine package provides the expected files.
 
 ### 2. Clone the repository
 

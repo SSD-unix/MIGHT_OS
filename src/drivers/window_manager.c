@@ -186,6 +186,8 @@ int wm_create_window(int x, int y, int w, int h, const char* title, uint32_t col
     windows[idx].bg_color = color;
     windows[idx].active = 1;
     windows[idx].visible = 1;
+
+    // Любые окна после встроенных Терминала(0) и System Info(1) помечаем как custom_gui
     windows[idx].custom_gui = (idx >= 2) ? 1 : 0;
     windows[idx].cmd_count = 0;
 
@@ -298,7 +300,6 @@ void wm_move_active_window(int dx, int dy) {
     windows[active_window_idx].y += dy;
 }
 
-/* --- Вспомогательный рендеринг примитивов с клиппингом --- */
 static void render_rect_clipped(int win_x, int win_y, int win_w, int win_h, int rel_x, int rel_y, int w, int h, uint32_t color) {
     int abs_x = win_x + rel_x;
     int abs_y = win_y + 22 + rel_y;
@@ -329,25 +330,11 @@ static void render_button_clipped(int win_x, int win_y, int win_w, int win_h, in
     print_at(text, abs_x, abs_y, 0xFFFFFF);
 }
 
-/* --- Системные вызовы отрисовки с сохранением в буфер окна --- */
 void wm_draw_window_rect(int win_id, int rel_x, int rel_y, int w, int h, uint32_t color) {
     if (win_id < 0 || win_id >= window_count || !windows[win_id].visible) return;
 
-    int found = -1;
-    for (int k = 0; k < windows[win_id].cmd_count; k++) {
-        if (windows[win_id].cmds[k].type == CMD_RECT &&
-            windows[win_id].cmds[k].x == rel_x &&
-            windows[win_id].cmds[k].y == rel_y) {
-            found = k;
-            break;
-        }
-    }
-    int idx = (found != -1) ? found : windows[win_id].cmd_count;
-    if (found == -1 && windows[win_id].cmd_count < MAX_WINDOW_CMDS) {
-        windows[win_id].cmd_count++;
-    }
-
-    if (idx < MAX_WINDOW_CMDS) {
+    if (windows[win_id].cmd_count < MAX_WINDOW_CMDS) {
+        int idx = windows[win_id].cmd_count++;
         windows[win_id].cmds[idx].type = CMD_RECT;
         windows[win_id].cmds[idx].x = rel_x;
         windows[win_id].cmds[idx].y = rel_y;
@@ -360,21 +347,8 @@ void wm_draw_window_rect(int win_id, int rel_x, int rel_y, int w, int h, uint32_
 void wm_draw_window_text(int win_id, int rel_x, int rel_y, const char* str, uint32_t color) {
     if (win_id < 0 || win_id >= window_count || !windows[win_id].visible || !str) return;
 
-    int found = -1;
-    for (int k = 0; k < windows[win_id].cmd_count; k++) {
-        if (windows[win_id].cmds[k].type == CMD_TEXT &&
-            windows[win_id].cmds[k].x == rel_x &&
-            windows[win_id].cmds[k].y == rel_y) {
-            found = k;
-            break;
-        }
-    }
-    int idx = (found != -1) ? found : windows[win_id].cmd_count;
-    if (found == -1 && windows[win_id].cmd_count < MAX_WINDOW_CMDS) {
-        windows[win_id].cmd_count++;
-    }
-
-    if (idx < MAX_WINDOW_CMDS) {
+    if (windows[win_id].cmd_count < MAX_WINDOW_CMDS) {
+        int idx = windows[win_id].cmd_count++;
         windows[win_id].cmds[idx].type = CMD_TEXT;
         windows[win_id].cmds[idx].x = rel_x;
         windows[win_id].cmds[idx].y = rel_y;
@@ -391,21 +365,8 @@ void wm_draw_window_text(int win_id, int rel_x, int rel_y, const char* str, uint
 void wm_draw_window_button(int win_id, int rel_x, int rel_y, int w, int h, const char* text, uint32_t bg_color) {
     if (win_id < 0 || win_id >= window_count || !windows[win_id].visible) return;
 
-    int found = -1;
-    for (int k = 0; k < windows[win_id].cmd_count; k++) {
-        if (windows[win_id].cmds[k].type == CMD_BUTTON &&
-            windows[win_id].cmds[k].x == rel_x &&
-            windows[win_id].cmds[k].y == rel_y) {
-            found = k;
-            break;
-        }
-    }
-    int idx = (found != -1) ? found : windows[win_id].cmd_count;
-    if (found == -1 && windows[win_id].cmd_count < MAX_WINDOW_CMDS) {
-        windows[win_id].cmd_count++;
-    }
-
-    if (idx < MAX_WINDOW_CMDS) {
+    if (windows[win_id].cmd_count < MAX_WINDOW_CMDS) {
+        int idx = windows[win_id].cmd_count++;
         windows[win_id].cmds[idx].type = CMD_BUTTON;
         windows[win_id].cmds[idx].x = rel_x;
         windows[win_id].cmds[idx].y = rel_y;
@@ -457,13 +418,14 @@ void wm_draw_scene(void) {
     print_at(" MIGHT OS 1.1 ", 8, 4, 0x61AFEF);
     print_at("[ALT+TAB] Switch | [ALT+F4] Close | [ALT+Arrows] Move", 180, 4, 0xABB2BF);
 
-    // 3. Оконный менеджер (двухпроходная отрисовка: сначала неактивные, затем активное окно сверху)
+    // 3. Оконный менеджер: pass 0 = неактивные окна, pass 1 = активное окно сверху
     for (int pass = 0; pass < 2; pass++) {
         for (int i = 0; i < window_count; i++) {
             if (!windows[i].visible) continue;
             int is_active = (i == active_window_idx);
 
-            if ((pass == 0 && is_active) || (pass == 1 && !is_active)) continue;
+            if (pass == 0 && is_active) continue;
+            if (pass == 1 && !is_active) continue;
 
             int wx = windows[i].x;
             int wy = windows[i].y;
@@ -511,8 +473,9 @@ void wm_draw_scene(void) {
 
                 print_hy_at("Բարի գալուստ MIGHT OS", tx, ty + 105, 0x61AFEF);
             }
-            // Пользовательские GUI-окна (i >= 2): Автоматический рендеринг сохраненных команд
-            else if (windows[i].custom_gui) {
+
+            // Пользовательские GUI-окна (i >= 2 или любое окно с custom_gui)
+            if (i >= 2 || windows[i].custom_gui) {
                 for (int c = 0; c < windows[i].cmd_count; c++) {
                     draw_cmd_t *cmd = &windows[i].cmds[c];
                     if (cmd->type == CMD_RECT) {
@@ -529,7 +492,7 @@ void wm_draw_scene(void) {
         }
     }
 
-    // 4. Отрисовка стрелочного курсора мыши (12x12 пикселей)
+    // 4. Отрисовка курсора мыши
     static const uint16_t cursor_sprite[12] = {
         0b100000000000,
         0b110000000000,

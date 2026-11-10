@@ -18,16 +18,22 @@ LDFLAGS = -m64 -nostdlib -no-pie -T ../linker.ld
 
 IMAGE = might.iso
 DATA_DISK = data.img
+BROWSER_BIN = ../browser/browser.bin
 
-.PHONY: all run clean
+.PHONY: all run clean $(BROWSER_BIN)
 
 all: $(IMAGE) $(DATA_DISK)
 
 ../hello.bin: ../hello.asm
 	nasm -f bin $< -o $@
 
-$(DATA_DISK): ../hello.bin
-	python3 ../pack.py ../hello.bin $(DATA_DISK)
+# Сборка браузера через его build.sh
+$(BROWSER_BIN):
+	cd ../browser && ./build.sh
+
+# Упаковка hello.bin и browser.bin в один data.img
+$(DATA_DISK): ../hello.bin $(BROWSER_BIN)
+	python3 ../pack.py $(DATA_DISK) ../hello.bin $(BROWSER_BIN)
 
 kernel.bin: $(OBJ)
 	$(LD) $(LDFLAGS) -o $@ $^
@@ -85,4 +91,5 @@ run: $(IMAGE) $(DATA_DISK)
 
 clean:
 	rm -f *.bin *.o *.elf *.iso *.img ../hello.bin net.pcap
+	rm -f ../browser/*.o ../browser/*.bin
 	rm -rf isodir limine.conf

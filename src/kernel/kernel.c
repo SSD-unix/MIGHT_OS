@@ -34,7 +34,7 @@
 #define FB_MAX_HEIGHT 1080
 #define FONT_W        8
 #define FONT_H        16
-/*network*/
+/* network */
 #define SYS_HTTP_GET      20
 
 char saved_password[64] = {0};
@@ -213,10 +213,10 @@ void flip_framebuffer(void) {
         uint8_t *src_row = (uint8_t*)&backbuffer[y * FB_MAX_WIDTH];
 
         size_t i = 0;
-        /* SSE2 Векторная выгрузка: 128-бит (16 байт / 4 пикселя) за одну инструкцию */
+        /* SSE2 Векторная выгрузка без требования к 16-байтовому выравниванию VRAM */
         for (; i + 16 <= row_bytes; i += 16) {
             __m128i chunk = _mm_loadu_si128((__m128i*)(src_row + i));
-            _mm_stream_si128((__m128i*)(dst_row + i), chunk);
+            _mm_storeu_si128((__m128i*)(dst_row + i), chunk);
         }
         /* Оставшиеся пиксели строки */
         for (; i < row_bytes; i++) {
@@ -376,8 +376,10 @@ uint64_t syscall_dispatcher(uint64_t sys_num, uint64_t a1, uint64_t a2, uint64_t
 
     return 0;
 }
-#define MAX_APPS 8
-static uint8_t app_buffers[MAX_APPS][65536] __attribute__((aligned(4096)));
+
+#define MAX_APPS 4
+#define APP_BUFFER_SIZE (8 * 1024 * 1024) // 8 MB под бинарник, BSS и Heap браузера
+static uint8_t app_buffers[MAX_APPS][APP_BUFFER_SIZE] __attribute__((aligned(4096)));
 static int app_buffer_idx = 0;
 
 void execute_external_app(char* filename) {
@@ -389,7 +391,8 @@ void execute_external_app(char* filename) {
     int buf_slot = app_buffer_idx;
     app_buffer_idx = (app_buffer_idx + 1) % MAX_APPS;
 
-    for (int i = 0; i < 65536; i++) {
+    /* Обнуляем весь буфер перед загрузкой, чтобы очистить BSS и кучу бинарника */
+    for (size_t i = 0; i < APP_BUFFER_SIZE; i++) {
         app_buffers[buf_slot][i] = 0;
     }
 
@@ -650,7 +653,6 @@ void kmain(uint64_t multiboot_addr) {
     kprint(" Pitch: ");
     kprint_int(sys_fb.framebuffer_pitch);
     kprint("\nType 'HELP' for commands.\n\n> ");
-
 
     pit_init(30);
     e1000_init();
