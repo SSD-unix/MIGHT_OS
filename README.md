@@ -20,7 +20,7 @@
 
 ## About
 
-MIGHT OS is a small operating-system project for exploring kernel development, boot processes, and low-level programming. The source tree includes boot code, a C kernel, drivers, networking, a browser, and applications.
+MIGHT OS is a small operating-system project for exploring kernel development, boot processes, and low-level programming. The source tree includes boot code, a C kernel, drivers, networking, and a browser-inspired application environment.
 
 The project is primarily written in C, with C++ and x86-64 assembly. The build creates a Limine-bootable ISO and a data disk image, and provides a QEMU run target.
 
@@ -99,7 +99,7 @@ Contributions and bug reports are welcome. Open an issue to discuss a change, th
 
 ## License
 
-This project is distributed under the MIT license in [LICENSE](LICENSE). Review its terms before using or redistributing the code.
+This project is distributed under a custom proprietary license. See [LICENSE](LICENSE) for the full terms. Viewing is permitted for evaluation and educational review only; redistribution, modification, execution, and other uses require explicit written permission from the copyright holder.
 
 ## Support
 
